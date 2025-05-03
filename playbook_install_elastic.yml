@@ -1,0 +1,55 @@
+
+---
+ - name: Instalar Elastic Agent (executável) nos servidores
+   hosts: servidores
+   become: false
+
+
+   vars:
+     local_agent_path: "/home/analyst/ansible/so-elastic-agent_linux_amd64"
+     remote_agent_path: "/home/analyst/so-elastic-agent_linux_amd64"
+     dns_entries:
+       - { ip: "192.168.58.11", hostname: "so-manager" }
+
+   tasks:
+
+     - name: Ajustar o DNS do servidor
+       lineinfile:
+         path: /etc/hosts
+         create: yes
+         line: "{{ item.ip }} {{ item.hostname }}"
+         state: present
+         regexp: "^{{ item.ip }}\\s+{{ item.hostname }}$"
+       loop: "{{ dns_entries }}"
+
+     - name: Verificar se o arquivo do agente existe localmente
+       stat:
+         path: "{{ local_agent_path }}"
+       delegate_to: localhost
+       register: agent_file
+
+     - name: Falhar se o arquivo do agente não existir
+       fail:
+         msg: "Arquivo do agente não encontrado em {{ local_agent_path }}"
+       when: not agent_file.stat.exists
+
+     - name: Copiar Elastic Agent (executável) para o host remoto
+       copy:
+         src: "{{ local_agent_path }}"
+         dest: "{{ remote_agent_path }}"
+         mode: '0777' # Já define permissão de execução
+   
+
+ #    - name: Garantir permissão de execução do agente
+ #      file:
+ #        path: "{{ remote_agent_path }}"
+ #        mode: '0777'
+ #        owner: analyst
+ #        group: analyst
+
+
+     # (Opcional) - Descomente se quiser executar o agente
+
+     - name: Executar o agente Elastic 
+       become_user: root
+       command: "{{ remote_agent_path }} --flags-ou-parametros"
