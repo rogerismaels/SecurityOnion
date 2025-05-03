@@ -50,7 +50,13 @@
 
 
      # (Opcional) - Descomente se quiser executar o agente
+     - name: Instalar o Elastic Agent
+       command: >
+         /home/analyst/so-elastic-agent_linux_amd64
+         -fleet https://192.168.50.11:8220
+         -token VXpqM2pwWUJ3RURCZjZpSlJCdlE6NGNsZGZxS3NTdjJpQjVwekpkVzJaZw==
 
-     - name: Executar o agente Elastic 
-       become_user: root
-       command: "{{ remote_agent_path }} --flags-ou-parametros"
+
+     #- name: Executar o agente Elastic 
+     #  become_user: root
+     #  command: "{{ remote_agent_path }} --flags-ou-parametros"
