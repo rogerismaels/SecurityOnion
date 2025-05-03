@@ -8,25 +8,26 @@
    vars:
      local_agent_path: "/home/analyst/ansible/so-elastic-agent_linux_amd64"
      remote_agent_path: "/home/analyst/so-elastic-agent_linux_amd64"
-     dns_entries:
-       - { ip: "192.168.58.11", hostname: "so-manager" }
+     #dns_entries:
+      # - { ip: "192.168.58.11", hostname: "so-manager" }
 
    tasks:
 
-     - name: Ajustar o DNS do servidor
-       lineinfile:
-         path: /etc/hosts
-         create: yes
-         line: "{{ item.ip }} {{ item.hostname }}"
-         state: present
-         regexp: "^{{ item.ip }}\\s+{{ item.hostname }}$"
-       loop: "{{ dns_entries }}"
+     #- name: Ajustar o DNS do servidor
+     #  lineinfile:
+     #    path: /etc/hosts
+     #    create: yes
+     #    line: "{{ item.ip }} {{ item.hostname }}"
+     #    state: present
+     #    regexp: "^{{ item.ip }}\\s+{{ item.hostname }}$"
+     #  loop: "{{ dns_entries }}"
 
      - name: Verificar se o arquivo do agente existe localmente
        stat:
          path: "{{ local_agent_path }}"
        delegate_to: localhost
        register: agent_file
+       become: false
 
      - name: Falhar se o arquivo do agente não existir
        fail:
